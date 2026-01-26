@@ -1,5 +1,6 @@
 
 Minimal Colab example using **whisper.cpp** to transcribe **a WAV** file and export **sub-token data** to a CSV: 
+(reference: https://github.com/ggml-org/whisper.cpp)
 
 # Requirements - Do this step before our session, please :) 
 - Google Colab (**You need a Gmail account.**) 
