@@ -1,0 +1,599 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "mount_file_id": "1qWmAwdO7Y4-fiUs98FSZviEGzp3jcGZY",
+      "authorship_tag": "ABX9TyOM9VNatc0WbAV96HFagUQd",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/anjelhafidi2003-code/Phonetics-PhonologyFev2026/blob/main/WER_CER_Arabic.ipynb%202.%20Algerian%20\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 2,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "WUPjsd2S1ch-",
+        "outputId": "81f64db0-1945-4b52-e236-9446184cae1d"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Collecting jiwer\n",
+            "  Downloading jiwer-4.0.0-py3-none-any.whl.metadata (3.3 kB)\n",
+            "Requirement already satisfied: click>=8.1.8 in /usr/local/lib/python3.12/dist-packages (from jiwer) (8.3.1)\n",
+            "Collecting rapidfuzz>=3.9.7 (from jiwer)\n",
+            "  Downloading rapidfuzz-3.14.5-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (12 kB)\n",
+            "Downloading jiwer-4.0.0-py3-none-any.whl (23 kB)\n",
+            "Downloading rapidfuzz-3.14.5-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (3.1 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m3.1/3.1 MB\u001b[0m \u001b[31m73.3 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hInstalling collected packages: rapidfuzz, jiwer\n",
+            "Successfully installed jiwer-4.0.0 rapidfuzz-3.14.5\n"
+          ]
+        }
+      ],
+      "source": [
+        "!pip install jiwer"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from google.colab import drive\n",
+        "drive.mount('/content/drive')"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "sMifWvJ7TeSx",
+        "outputId": "52fc284f-a226-4652-b210-a564972c0437"
+      },
+      "execution_count": 3,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Drive already mounted at /content/drive; to attempt to forcibly remount, call drive.mount(\"/content/drive\", force_remount=True).\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import csv\n",
+        "\n",
+        "tokens = []\n",
+        "\n",
+        "# Update the path to 'tokens.2.csv' to reflect its location in the Colab environment\n",
+        "# If it's directly in the files section, the path would be '/content/tokens.2.csv'\n",
+        "with open('/content/tokens.2.csv', encoding='windows-1256') as f:\n",
+        "    reader = csv.DictReader(f, delimiter=';')\n",
+        "    for row in reader:\n",
+        "        token = row['token']\n",
+        "        # skip special tokens like [_BEG_], [_TT_400], etc.\n",
+        "        if token.startswith('[') and token.endswith(']'):\n",
+        "            continue\n",
+        "        tokens.append(token)\n",
+        "\n",
+        "hypothesis = ''.join(tokens)\n",
+        "print(hypothesis)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 263
+        },
+        "id": "cmHgHE3wLhXI",
+        "outputId": "1d00a6a7-dcd5-46a6-c762-3d8f68670d8d"
+      },
+      "execution_count": 4,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "FileNotFoundError",
+          "evalue": "[Errno 2] No such file or directory: '/content/tokens.2.csv'",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mFileNotFoundError\u001b[0m                         Traceback (most recent call last)",
+            "\u001b[0;32m/tmp/ipykernel_1602/4008802916.py\u001b[0m in \u001b[0;36m<cell line: 0>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      5\u001b[0m \u001b[0;31m# Update the path to 'tokens.2.csv' to reflect its location in the Colab environment\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      6\u001b[0m \u001b[0;31m# If it's directly in the files section, the path would be '/content/tokens.2.csv'\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 7\u001b[0;31m \u001b[0;32mwith\u001b[0m \u001b[0mopen\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'/content/tokens.2.csv'\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mencoding\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m'windows-1256'\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;32mas\u001b[0m \u001b[0mf\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      8\u001b[0m     \u001b[0mreader\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mcsv\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mDictReader\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mf\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mdelimiter\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m';'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      9\u001b[0m     \u001b[0;32mfor\u001b[0m \u001b[0mrow\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mreader\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mFileNotFoundError\u001b[0m: [Errno 2] No such file or directory: '/content/tokens.2.csv'"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "e64bfcc3"
+      },
+      "source": [
+        "from jiwer import process_words, process_characters\n",
+        "reference = \"\"\"يُحكي أنه في يوم من الأيام كانت هناك شجرة تفاحٍ كبيرة فارعة الأغصان، مُمتلئة الثمر، قويّة الجذع والأغصان، وبجانب الشّجرة كان هناك طفلٌ قريب منها، يلعب ويلهو، ويتسلّق على أغصانها، ويأكل من ثمارها، وإذا تعب من اللّعب نام تحتها مستظلاً بظلالها وأغصانها الكبيرة، وكان هذا بشكلٍ يومي. مرّت الأيّام وكبُر الطّفل وانشغل عن الشّجرة فتوقف عن الذّهاب إليها، ولكنّه عاد يوماً إليها وهو حزين، فطلبت منه الشجرة اللعب معها، فقال الولد: أنا لم أعد صغيراً وإني بحاجةٍ لبعض النقودِ كي أشتري بعض الحاجيّات، فقالت له أنا لا يوجد معي نقود؛ ولكن خُذ ثمر التّفاح من أغصاني، وقم ببيعه، واستخدم الأرباح لتشتري ما تريده، فجمع الولد كل ثمارها وأخذها وهو سعيد وغادرها ولم يعد، فباتت الشّجرة حزينة.\\nبعد أعوامٍ عاد الطفل، وكالعادة قالت له الشجرة تعال والعب معي، فقال لها لقد أصبحت رجلاً كبيراً، ولديّ عائلة أنا مسؤول عنها، وأحتاج لبناء بيت، هل تستطيعين مساعدتي؟، فقالت له أنا لا أملك بيتاً ولكن بإمكانك أن تأخذ من أغصاني كما تشاء لتبني بيتك، ففعل الرجل وأخذ الأغصان وغادر وهو مسرور. تمرّ الأيام والسنوات والشجرة وحيدة حزينة على الطفل الذي كبر وأصبح رجلاً ولم يعد يلتقي بها، وفجأة جاءها في يوم صيفٍ حار جداً فسعدت الشجرة بقدومه وقالت له العب معي، فقال لقد كبرت كثيراً وأصبحت عجوزاً وأريد أن أرتاح من عناء الدُنيا وأن أعيش فترة استرخاء، أريد أن أبحر بعيداً عن الناس ولكني لا أملك مركباً أبحر به.\\nفقالت له الشجرة: خُذ من جذعي واصنع مركباً، فأخذ من جذعها وصنع المركب وذهب عنها ولم يعد لسنين طويلة؛ وبعد كل هذه السنين عاد الرجل للشجرة، وقد اعتادت عليه أنه يعود ليطلب شيئاً منها فسابقته بالقول: \"آسفة ولكني أصبحت كبيرة جداً ولا أملك شيئا لأمنحك إياه\"، قالت له لا يوجد تفاح لتأكل أو لتبيع فقال لها: \"لا داعي فليس لدي الأسنان لأقضمها\".\\nتابعت الشجرة حديثها فقالت له لم يعد لديّ جذع حتّى تلعب وتتسلّق عليه، فقال لها لا حاجة لي به فقد أصبحت كهلاً عجوزاً لا أستطيع القيام بذلك، فحزنت الشجرة كثيراً؛ لأنّها لا تملك ما تعطيه فهي شبه ميتة؛ جذورها أصبحت ضعيفة، فرد عليها العجوز قائلاً: كل ما أحتاجه وأريده الآن هو أن أرتاح من هذه السنين، أحتاج مكاناً للراحة فقط، فقالت له الشجرة هذه جذوري وهي ما تبقى لدي يمكنك الجلوس وأخذ قسط من الراحة بجانبي، اجلس واستلقِ هنا كما تشاء.\\nالحكمة المستفادة من هذه القصّة هي: يجب تقدير كل النّعم التي يمنحها لنا الخالق، كنعمة الوالدين، ونعمة الصحة، ونعمة جمال الطبيعة وعطائها، وعلينا المحافظة على هذه النعم باستمرار. حيث شبّه الكاتب الشجرة بالأم التي تبقى ترعى طفلها حتى يكبر، وتُفني حياتها كلّها في توفير احتياجاته وتقدم له كل ما يحتاجه كل لما لجأ إليها، حتى تنفذ كل طاقاتها وتُصبح غير قادرة على العطاء، فيكبر هذا الطفل ويُصبح شاباً ثم رجلاً ثم عجوزاً كهلاً ولم يدرك قيمة والديه إلا عندما فقد كل شيء، واحتاج للراحة فيلجأ إليهم من جديد لأنه يعلم أن الوالدين هم مصدر الرّاحة.\\n\"\"\"\n",
+        "wer_result_raw = process_words(reference, hypothesis)\n",
+        "cer_result_raw = process_characters(reference, hypothesis)\n",
+        "\n",
+        "print(\"WER:\", round(wer_result_raw.wer * 100, 2), \"%\")\n",
+        "print(\"Substitutions:\", wer_result_raw.substitutions)\n",
+        "print(\"Deletions:\", wer_result_raw.deletions)\n",
+        "print(\"Insertions:\", wer_result_raw.insertions)\n",
+        "print(\"CER:\", round(cer_result_raw.cer * 100, 2), \"%\")"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from jiwer import process_words\n",
+        "\n",
+        "wer_result_raw = process_words(reference, hypothesis)\n",
+        "\n",
+        "print(\"WER:\", round(wer_result_raw.wer * 100, 2), \"%\")\n",
+        "print(\"Substitutions:\", wer_result_raw.substitutions)\n",
+        "print(\"Deletions:\", wer_result_raw.deletions)\n",
+        "print(\"Insertions:\", wer_result_raw.insertions)"
+      ],
+      "metadata": {
+        "id": "U4f1ktQ4PZ44"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from jiwer import visualize_alignment\n",
+        "\n",
+        "# Visualize raw alignment\n",
+        "alignment_output_raw = visualize_alignment(wer_result_raw)\n",
+        "print(\"--- Raw Alignment ---\")\n",
+        "print(alignment_output_raw)\n"
+      ],
+      "metadata": {
+        "id": "TrcTjoOQU225"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "a8860b72"
+      },
+      "source": [
+        "from jiwer import visualize_alignment\n",
+        "\n",
+        "# Ensure alignment_output_raw is available for saving\n",
+        "# If this cell is run independently, ensure wer_result_raw is defined\n",
+        "# (otherwise it would have been defined by TrcTjoOQU225 or U4f1ktQ4PZ44)\n",
+        "# Re-calculating if not present, though in typical flow it would be.\n",
+        "if 'wer_result_raw' not in locals():\n",
+        "    # This block should ideally not be needed if execution flow is linear\n",
+        "    # but added for robustness if user runs this cell out of order\n",
+        "    from jiwer import process_words\n",
+        "    alignment_output_raw = visualize_alignment(process_words(reference, hypothesis))\n",
+        "else:\n",
+        "    alignment_output_raw = visualize_alignment(wer_result_raw)\n",
+        "\n",
+        "with open('raw_alignment_visualization.txt', 'w', encoding='utf-8') as f:\n",
+        "    f.write(alignment_output_raw)\n",
+        "\n",
+        "print(\"Raw alignment visualization saved to 'raw_alignment_visualization.txt'\")"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import re\n",
+        "import string\n",
+        "\n",
+        "# Define 'reference' for robustness if previous cells are not run\n",
+        "reference = \"\"\"يُحكي أنه في يوم من الأيام كانت هناك شجرة تفاحٍ كبيرة فارعة الأغصان، مُمتلئة الثمر، قويّة الجذع والأغصان، وبجانب الشّجرة كان هناك طفلٌ قريب منها، يلعب ويلهو، ويتسلّق على أغصانها، ويأكل من ثمارها، وإذا تعب من اللّعب نام تحتها مستظلاً بظلالها وأغصانها الكبيرة، وكان هذا بشكلٍ يومي. مرّت الأيّام وكبُر الطّفل وانشغل عن الشّجرة فتوقف عن الذّهاب إليها، ولكنّه عاد يوماً إليها وهو حزين، فطلبت منه الشجرة اللعب معها، فقال الولد: أنا لم أعد صغيراً وإني بحاجةٍ لبعض النقودِ كي أشتري بعض الحاجيّات، فقالت له أنا لا يوجد معي نقود؛ ولكن خُذ ثمر التّفاح من أغصاني، وقم ببيعه، واستخدم الأرباح لتشتري ما تريده، فجمع الولد كل ثمارها وأخذها وهو سعيد وغادرها ولم يعد، فباتت الشّجرة حزينة.\\nبعد أعوامٍ عاد الطفل، وكالعادة قالت له الشجرة تعال والعب معي، فقال لها لقد أصبحت رجلاً كبيراً، ولديّ عائلة أنا مسؤول عنها، وأحتاج لبناء بيت، هل تستطيعين مساعدتي؟، فقالت له أنا لا أملك بيتاً ولكن بإمكانك أن تأخذ من أغصاني كما تشاء لتبني بيتك، ففعل الرجل وأخذ الأغصان وغادر وهو مسرور. تمرّ الأيام والسنوات والشجرة وحيدة حزينة على الطفل الذي كبر وأصبح رجلاً ولم يعد يلتقي بها، وفجأة جاءها في يوم صيفٍ حار جداً فسعدت الشجرة بقدومه وقالت له العب معي، فقال لقد كبرت كثيراً وأصبحت عجوزاً وأريد أن أرتاح من عناء الدُنيا وأن أعيش فترة استرخاء، أريد أن أبحر بعيداً عن الناس ولكني لا أملك مركباً أبحر به.\\nفقالت له الشجرة: خُذ من جذعي واصنع مركباً، فأخذ من جذعها وصنع المركب وذهب عنها ولم يعد لسنين طويلة؛ وبعد كل هذه السنين عاد الرجل للشجرة، وقد اعتادت عليه أنه يعود ليطلب شيئاً منها فسابقته بالقول: \\\"آسفة ولكني أصبحت كبيرة جداً ولا أملك شيئا لأمنحك إياه\\\"، قالت له لا يوجد تفاح لتأكل أو لتبيع فقال لها: \\\"لا داعي فليس لدي الأسنان لأقضمها\\\".\\nتابعت الشجرة حديثها فقالت له لم يعد لديّ جذع حتّى تلعب وتتسلّق عليه، فقال لها لا حاجة لي به فقد أصبحت كهلاً عجوزاً لا أستطيع القيام بذلك، فحزنت الشجرة كثيراً؛ لأنّها لا تملك ما تعطيه فهي شبه ميتة؛ جذورها أصبحت ضعيفة، فرد عليها العجوز قائلاً: كل ما أحتاجه وأريده الآن هو أن أرتاح من هذه السنين، أحتاج مكاناً للراحة فقط، فقالت له الشجرة هذه جذوري وهي ما تبقى لدي يمكنك الجلوس وأخذ قسط من الراحة بجانبي، اجلس واستلقِ هنا كما تشاء.\\nالحكمة المستفادة من هذه القصّة هي: يجب تقدير كل النّعم التي يمنحها لنا الخالق، كنعمة الوالدين، ونعمة الصحة، ونعمة جمال الطبيعة وعطائها، وعلينا المحافظة على هذه النعم باستمرار. حيث شبّه الكاتب الشجرة بالأم التي تبقى ترعى طفلها حتى يكبر، وتُفني حياتها كلّها في توفير احتياجاته وتقدم له كل ما يحتاجه كل لما لجأ إليها، حتى تنفذ كل طاقاتها وتُصبح غير قادرة على العطاء، فيكبر هذا الطفل ويُصبح شاباً ثم رجلاً ثم عجوزاً كهلاً ولم يدرك قيمة والديه إلا عندما فقد كل شيء، واحتاج للراحة فيلجأ إليهم من جديد لأنه يعلم أن الوالدين هم مصدر الرّاحة.\\n\"\"\"\n",
+        "\n",
+        "def normalize_arabic(text):\n",
+        "\n",
+        "    # 1. Remove diacritics (the small marks above/below letters like َ ُ ِ)\n",
+        "    text = re.sub(r'[\\u064B-\\u065F\\u0670]', '', text)\n",
+        "\n",
+        "    # 2. Normalize alef variants (إ أ آ ٱ all become ا)\n",
+        "    text = re.sub(r'[إأآٱ]', 'ا', text)\n",
+        "\n",
+        "    # 3. Normalize waw with hamza (ؤ becomes و)\n",
+        "    text = re.sub(r'ؤ', 'و', text)\n",
+        "\n",
+        "    # 4. Normalize yeh variants (ى and ئ become ي)\n",
+        "    text = re.sub(r'[ىئ]', 'ي', text)\n",
+        "\n",
+        "    # 5. Remove punctuation (updated to remove all punctuation explicitly)\n",
+        "    # Combine standard English punctuation with common Arabic punctuation\n",
+        "    arabic_punctuation = '،؛؟«»٪'\n",
+        "    all_punctuation = string.punctuation + arabic_punctuation\n",
+        "    translator = str.maketrans('', '', all_punctuation)\n",
+        "    text = text.translate(translator)\n",
+        "\n",
+        "    # 7. Clean up extra spaces\n",
+        "    text = re.sub(r'\\s+', ' ', text).strip()\n",
+        "\n",
+        "    return text\n",
+        "\n",
+        "# Apply it to both texts\n",
+        "reference_normalized  = normalize_arabic(reference)\n",
+        "hypothesis_normalized = normalize_arabic(hypothesis)\n",
+        "\n",
+        "print(\"Reference (normalized):\")\n",
+        "print(reference_normalized[:200])\n",
+        "print(\"\\nHypothesis (normalized):\")\n",
+        "print(hypothesis_normalized[:200])"
+      ],
+      "metadata": {
+        "id": "xleaYbdKWXQP"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "561c5a42"
+      },
+      "source": [
+        "from jiwer import process_words\n",
+        "\n",
+        "wer_result_normalized = process_words(reference_normalized, hypothesis_normalized)\n",
+        "\n",
+        "print(\"WER:\", round(wer_result_normalized.wer * 100, 2), \"%\")\n",
+        "print(\"Substitutions:\", wer_result_normalized.substitutions)\n",
+        "print(\"Deletions:\", wer_result_normalized.deletions)\n",
+        "print(\"Insertions:\", wer_result_normalized.insertions)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "c8360c0e"
+      },
+      "source": [
+        "from jiwer import visualize_alignment\n",
+        "\n",
+        "# Visualize normalized alignment\n",
+        "alignment_output_normalized = visualize_alignment(wer_result_normalized)\n",
+        "print(\"--- Normalized Alignment ---\")\n",
+        "print(alignment_output_normalized)\n",
+        "\n",
+        "with open('normalized_alignment_visualization.txt', 'w', encoding='utf-8') as f:\n",
+        "    f.write(alignment_output_normalized)\n",
+        "\n",
+        "print(\"Normalized alignment visualization saved to 'normalized_alignment_visualization.txt'\")\n",
+        "print(\"File ready for download.\")"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "9dc3d8a8"
+      },
+      "source": [
+        "from jiwer import process_words\n",
+        "from IPython.display import HTML, display\n",
+        "\n",
+        "def colored_alignment(reference, hypothesis):\n",
+        "    result = process_words(reference, hypothesis)\n",
+        "\n",
+        "    ref_words = reference.split()\n",
+        "    hyp_words = hypothesis.split()\n",
+        "\n",
+        "    html_ref = []\n",
+        "    html_hyp = []\n",
+        "\n",
+        "    for chunk in result.alignments[0]:\n",
+        "        if chunk.type == 'equal':\n",
+        "            for i in range(chunk.ref_end_idx - chunk.ref_start_idx):\n",
+        "                ref_word = ref_words[chunk.ref_start_idx + i]\n",
+        "                hyp_word = hyp_words[chunk.hyp_start_idx + i]\n",
+        "                html_ref.append(f'<span>{ref_word}</span>')\n",
+        "                html_hyp.append(f'<span>{hyp_word}</span>')\n",
+        "\n",
+        "        elif chunk.type == 'substitute':\n",
+        "            for i in range(chunk.ref_end_idx - chunk.ref_start_idx):\n",
+        "                ref_word = ref_words[chunk.ref_start_idx + i]\n",
+        "                hyp_word = hyp_words[chunk.hyp_start_idx + i]\n",
+        "                # orange for substitutions\n",
+        "                html_ref.append(f'<span style=\"background-color:#FFD580; padding:2px 4px; border-radius:3px;\">{ref_word}</span>')\n",
+        "                html_hyp.append(f'<span style=\"background-color:#FFD580; padding:2px 4px; border-radius:3px;\">{hyp_word}</span>')\n",
+        "\n",
+        "        elif chunk.type == 'delete':\n",
+        "            for i in range(chunk.ref_end_idx - chunk.ref_start_idx):\n",
+        "                ref_word = ref_words[chunk.ref_start_idx + i]\n",
+        "                # red for deletions\n",
+        "                html_ref.append(f'<span style=\"background-color:#FFAAAA; padding:2px 4px; border-radius:3px;\">{ref_word}</span>')\n",
+        "                html_hyp.append(f'<span style=\"background-color:#FFAAAA; padding:2px 4px; border-radius:3px;\">***</span>')\n",
+        "\n",
+        "        elif chunk.type == 'insert':\n",
+        "            for i in range(chunk.hyp_end_idx - chunk.hyp_start_idx):\n",
+        "                hyp_word = hyp_words[chunk.hyp_start_idx + i]\n",
+        "                # green for insertions\n",
+        "                html_ref.append(f'<span style=\"background-color:#AAFFAA; padding:2px 4px; border-radius:3px;\">***</span>')\n",
+        "                html_hyp.append(f'<span style=\"background-color:#AAFFAA; padding:2px 4px; border-radius:3px;\">{hyp_word}</span>')\n",
+        "\n",
+        "    html = f\"\"\"\n",
+        "    <div style=\"direction:rtl; font-size:16px; line-height:2.5; font-family:Arial;\">\n",
+        "        <div style=\"margin-bottom:12px;\">\n",
+        "            <b>Legend:</b>\n",
+        "            <span style=\"background-color:#FFD580; padding:2px 8px; border-radius:3px; margin:0 6px;\">Substitution</span>\n",
+        "            <span style=\"background-color:#FFAAAA; padding:2px 8px; border-radius:3px; margin:0 6px;\">Deletion</span>\n",
+        "            <span style=\"background-color:#AAFFAA; padding:2px 8px; border-radius:3px; margin:0 6px;\">Insertion</span>\n",
+        "        </div>\n",
+        "        <p><b>REF:</b> {' '.join(html_ref)}</p>\n",
+        "        <p><b>HYP:</b> {' '.join(html_hyp)}</p>\n",
+        "    </div>\n",
+        "    \"\"\"\n",
+        "    return html\n",
+        "\n",
+        "highlighted_html_content = colored_alignment(reference_normalized, hypothesis_normalized)\n",
+        "display(HTML(highlighted_html_content))"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "8b6cf997"
+      },
+      "source": [
+        "with open('/content/highlighted_normalized_alignment.html', 'w', encoding='utf-8') as f:\n",
+        "    f.write(highlighted_html_content)\n",
+        "\n",
+        "print(\"Highlighted normalized alignment saved to 'highlighted_normalized_alignment.html'\")\n",
+        "print(\"File ready for download.\")"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from jiwer import process_words, process_characters, visualize_alignment\n",
+        "\n",
+        "wer_result_normalized = process_words(reference_normalized, hypothesis_normalized)\n",
+        "cer_result_normalized = process_characters(reference_normalized, hypothesis_normalized)\n",
+        "\n",
+        "print(\"WER:\", round(wer_result_normalized.wer * 100, 2), \"%\")\n",
+        "print(\"Substitutions:\", wer_result_normalized.substitutions)\n",
+        "print(\"Deletions:\", wer_result_normalized.deletions)\n",
+        "print(\"Insertions:\", wer_result_normalized.insertions)\n",
+        "print(\"CER:\", round(cer_result_normalized.cer * 100, 2), \"%\")\n",
+        "\n",
+        "print(\"\\n--- Alignment ---\")\n",
+        "print(visualize_alignment(wer_result_normalized))"
+      ],
+      "metadata": {
+        "id": "wgunPiJuWuZw"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "e267b4ac"
+      },
+      "source": [
+        "from jiwer import visualize_alignment\n",
+        "\n",
+        "# Visualize normalized alignment\n",
+        "alignment_output_normalized = visualize_alignment(wer_result_normalized)\n",
+        "print(\"--- Normalized Alignment ---\")\n",
+        "print(alignment_output_normalized)\n",
+        "\n",
+        "with open('normalized_alignment_visualization.txt', 'w', encoding='utf-8') as f:\n",
+        "    f.write(alignment_output_normalized)\n",
+        "\n",
+        "print(\"Normalized alignment visualization saved to 'normalized_alignment_visualization.txt'\")"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "32180b9c"
+      },
+      "source": [
+        "import matplotlib.pyplot as plt\n",
+        "import numpy as np\n",
+        "\n",
+        "# Data for plotting (using the raw WER results)\n",
+        "# 'wer_result_raw' is now correctly available from the execution of cell U4f1ktQ4PZ44\n",
+        "\n",
+        "labels = ['Substitutions', 'Deletions', 'Insertions']\n",
+        "wer_error_counts_raw = [wer_result_raw.substitutions, wer_result_raw.deletions, wer_result_raw.insertions]\n",
+        "\n",
+        "fig, ax = plt.subplots(figsize=(8, 6))\n",
+        "ax.bar(labels, wer_error_counts_raw, color=['skyblue', 'lightcoral', 'lightgreen'])\n",
+        "\n",
+        "ax.set_ylabel('Number of Errors')\n",
+        "ax.set_title('Raw WER Error Breakdown')\n",
+        "\n",
+        "# Add the error counts on top of the bars\n",
+        "for i, v in enumerate(wer_error_counts_raw):\n",
+        "    ax.text(i, v + 0.5, str(v), ha='center', va='bottom', fontsize=12)\n",
+        "\n",
+        "plt.grid(axis='y', linestyle='--', alpha=0.7)\n",
+        "plt.show()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "hSarkq3eqKyC"
+      },
+      "source": [
+        "import matplotlib.pyplot as plt\n",
+        "import numpy as np\n",
+        "\n",
+        "# Data for plotting (using the normalized WER results)\n",
+        "labels = ['Substitutions', 'Deletions', 'Insertions']\n",
+        "wer_error_counts = [wer_result_normalized.substitutions, wer_result_normalized.deletions, wer_result_normalized.insertions]\n",
+        "\n",
+        "fig, ax = plt.subplots(figsize=(8, 6))\n",
+        "ax.bar(labels, wer_error_counts, color=['skyblue', 'lightcoral', 'lightgreen'])\n",
+        "\n",
+        "ax.set_ylabel('Number of Errors')\n",
+        "ax.set_title('Normalized WER Error Breakdown')\n",
+        "\n",
+        "# Add the error counts on top of the bars\n",
+        "for i, v in enumerate(wer_error_counts):\n",
+        "    ax.text(i, v + 0.5, str(v), ha='center', va='bottom', fontsize=12)\n",
+        "\n",
+        "plt.grid(axis='y', linestyle='--', alpha=0.7)\n",
+        "plt.show()"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from jiwer import process_words\n",
+        "from IPython.display import HTML, display\n",
+        "\n",
+        "def colored_alignment(reference, hypothesis):\n",
+        "    result = process_words(reference, hypothesis)\n",
+        "\n",
+        "    ref_words = reference.split()\n",
+        "    hyp_words = hypothesis.split()\n",
+        "\n",
+        "    html_ref = []\n",
+        "    html_hyp = []\n",
+        "\n",
+        "    for chunk in result.alignments[0]:\n",
+        "        if chunk.type == 'equal':\n",
+        "            for i in range(chunk.ref_end_idx - chunk.ref_start_idx):\n",
+        "                ref_word = ref_words[chunk.ref_start_idx + i]\n",
+        "                hyp_word = hyp_words[chunk.hyp_start_idx + i]\n",
+        "                html_ref.append(f'<span>{ref_word}</span>')\n",
+        "                html_hyp.append(f'<span>{hyp_word}</span>')\n",
+        "\n",
+        "        elif chunk.type == 'substitute':\n",
+        "            for i in range(chunk.ref_end_idx - chunk.ref_start_idx):\n",
+        "                ref_word = ref_words[chunk.ref_start_idx + i]\n",
+        "                hyp_word = hyp_words[chunk.hyp_start_idx + i]\n",
+        "                # orange for substitutions\n",
+        "                html_ref.append(f'<span style=\"background-color:#FFD580; padding:2px 4px; border-radius:3px;\">{ref_word}</span>')\n",
+        "                html_hyp.append(f'<span style=\"background-color:#FFD580; padding:2px 4px; border-radius:3px;\">{hyp_word}</span>')\n",
+        "\n",
+        "        elif chunk.type == 'delete':\n",
+        "            for i in range(chunk.ref_end_idx - chunk.ref_start_idx):\n",
+        "                ref_word = ref_words[chunk.ref_start_idx + i]\n",
+        "                # red for deletions\n",
+        "                html_ref.append(f'<span style=\"background-color:#FFAAAA; padding:2px 4px; border-radius:3px;\">{ref_word}</span>')\n",
+        "                html_hyp.append(f'<span style=\"background-color:#FFAAAA; padding:2px 4px; border-radius:3px;\">***</span>')\n",
+        "\n",
+        "        elif chunk.type == 'insert':\n",
+        "            for i in range(chunk.hyp_end_idx - chunk.hyp_start_idx):\n",
+        "                hyp_word = hyp_words[chunk.hyp_start_idx + i]\n",
+        "                # green for insertions\n",
+        "                html_ref.append(f'<span style=\"background-color:#AAFFAA; padding:2px 4px; border-radius:3px;\">***</span>')\n",
+        "                html_hyp.append(f'<span style=\"background-color:#AAFFAA; padding:2px 4px; border-radius:3px;\">{hyp_word}</span>')\n",
+        "\n",
+        "    html = f\"\"\"\n",
+        "    <div style=\"direction:rtl; font-size:16px; line-height:2.5; font-family:Arial;\">\n",
+        "        <div style=\"margin-bottom:12px;\">\n",
+        "            <b>Legend:</b>\n",
+        "            <span style=\"background-color:#FFD580; padding:2px 8px; border-radius:3px; margin:0 6px;\">Substitution</span>\n",
+        "            <span style=\"background-color:#FFAAAA; padding:2px 8px; border-radius:3px; margin:0 6px;\">Deletion</span>\n",
+        "            <span style=\"background-color:#AAFFAA; padding:2px 8px; border-radius:3px; margin:0 6px;\">Insertion</span>\n",
+        "        </div>\n",
+        "        <p><b>REF:</b> {' '.join(html_ref)}</p>\n",
+        "        <p><b>HYP:</b> {' '.join(html_hyp)}</p>\n",
+        "    </div>\n",
+        "    \"\"\"\n",
+        "    return html\n",
+        "\n",
+        "highlighted_html_content = colored_alignment(reference_normalized, hypothesis_normalized)\n",
+        "display(HTML(highlighted_html_content))\n"
+      ],
+      "metadata": {
+        "id": "Kqrn1s4q0kFY"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "07e1e630"
+      },
+      "source": [
+        "with open('/content/highlighted_normalized_alignment.html', 'w', encoding='utf-8') as f:\n",
+        "    f.write(highlighted_html_content)\n",
+        "\n",
+        "print(\"Highlighted normalized alignment saved to 'highlighted_normalized_alignment.html'\")\n",
+        "print(\"File ready for download.\")"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "0fa6aab1"
+      },
+      "source": [
+        "highlighted_raw_html_content = colored_alignment(reference, hypothesis)"
+      ],
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "id": "94f31135"
+      },
+      "source": [
+        "with open('/content/highlighted_raw_alignment.html', 'w', encoding='utf-8') as f:\n",
+        "    f.write(highlighted_raw_html_content)\n",
+        "\n",
+        "print(\"Highlighted raw alignment saved to 'highlighted_raw_alignment.html'\")\n",
+        "print(\"File ready for download.\")"
+      ],
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
